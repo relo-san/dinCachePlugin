@@ -63,7 +63,7 @@ class dinCacheRoutingConfigHandler extends sfYamlConfigHandler
         $config = sfFactoryConfigHandler::getConfiguration(
             sfContext::getInstance()->getConfiguration()->getConfigPaths( 'config/factories.yml' )
         );
-        return $config['cache_routing']['param'];
+        return $config['cache_manager']['param'];
 
     } // dinCacheRoutingConfigHandler::getOptions()
 

@@ -41,7 +41,7 @@ class dinFactoryConfigHandler extends sfYamlConfigHandler
     $instances = array();
 
     // available list of factories
-    $factories = array('view_cache_manager', 'logger', 'i18n', 'controller', 'request', 'response', 'storage', 'user', 'cache_routing', 'routing', 'view_cache', 'mailer');
+    $factories = array('view_cache_manager', 'logger', 'i18n', 'controller', 'request', 'response', 'storage', 'user', 'cache_manager', 'routing', 'view_cache', 'mailer');
 
     // let's do our fancy work
     foreach ($factories as $factory)
@@ -172,10 +172,10 @@ class dinFactoryConfigHandler extends sfYamlConfigHandler
                          );
           break;
 
-        case 'cache_routing':
+        case 'cache_manager':
 
-          $instances[] = sprintf("  \$class = sfConfig::get('sf_factory_cache_routing', '%s');\n".
-                           "\$this->factories['cache_routing'] = new \$class(\$this->dispatcher, %s );\n",
+          $instances[] = sprintf("  \$class = sfConfig::get('sf_factory_cache_manager', '%s');\n".
+                           "\$this->factories['cache_manager'] = new \$class(\$this->dispatcher, %s );\n",
                            $class, var_export($parameters, true)
                          );
           break;
