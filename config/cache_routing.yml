@@ -1,0 +1,50 @@
+# This file is part of the dinCachePlugin package.
+# (c) DineCat, 2010 http://dinecat.com/
+#
+# For the full copyright and license information, please view the LICENSE file,
+# that was distributed with this package, or see http://www.dinecat.com/din/license.html
+
+# Default cache routing configuration
+#
+# @package      dinCachePlugin
+# @subpackage   config
+# @author       Nicolay N.Zyk <relo.san.pub@gmail.com>
+
+routes:
+    page:
+        type:           'page'
+        get:
+            model:      ':model'
+            method:     'getListPagerQuery'
+            path:       ':_root/:_model/:_type/def/:page'
+            key:        ':_type.:page.:_i18n.cache'
+        remove:
+            default:
+                path:   ':_root/:_model/:_type/def/*/*/*/'
+                key:    '*.cache'
+
+    data:
+        type:           'data'
+        get:
+            model:      ':model'
+            method:     'getItemQuery'
+            path:       ':_root/:_model/:_type/def/:id'
+            key:        ':_type.:id.:_i18n.cache'
+        remove:
+            default:
+                path:   ':_root/:_model/:_type/def/:id'
+                key:    ':_type.:id.*.cache'
+
+    choices:
+        type:           'choices'
+        get:
+            model:      ':model'
+            method:     'getChoicesQuery'
+            path:       ':_root/:_model/:_type/def'
+            key:        ':_type.:_i18n.cache'
+        remove:
+            default:
+                path:   ':_root/:_model/:_type/def'
+                key:    ':_type.*.cache'
+
+#EOF
