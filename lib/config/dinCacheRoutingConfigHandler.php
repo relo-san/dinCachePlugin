@@ -13,7 +13,7 @@
  * 
  * @package     dinCachePlugin
  * @subpackage  lib.config
- * @author      Nicolay N.Zyk <relo.san.pub@gmail.com>
+ * @author      Nicolay N. Zyk <relo.san@gmail.com>
  */
 class dinCacheRoutingConfigHandler extends sfYamlConfigHandler
 {
@@ -41,7 +41,10 @@ class dinCacheRoutingConfigHandler extends sfYamlConfigHandler
         foreach ( $config['links'] as $model => $routes )
         {
             $data[] = sprintf( '$this->links[\'%s\'] = %s;', $model, $this->asPhp( $routes ) );
-            $data[] = sprintf( '$this->trans[\'%s\'] = %s;', $model, Doctrine::getTable( $model )->hasRelation( 'Translation' ) ? 'true' : 'false' );
+            $data[] = sprintf(
+                '$this->trans[\'%s\'] = %s;', $model,
+                Doctrine::getTable( $model )->hasRelation( 'Translation' ) ? 'true' : 'false'
+            );
         }
 
         return sprintf(
@@ -53,7 +56,7 @@ class dinCacheRoutingConfigHandler extends sfYamlConfigHandler
 
 
     /**
-     * Get factory options
+     * Get factory (default for routes) options
      * 
      * @return  string  Config factory options
      */

@@ -13,7 +13,7 @@
  * 
  * @package     dinCachePlugin
  * @subpackage  lib.record
- * @author      Nicolay N.Zyk <relo.san.pub@gmail.com>
+ * @author      Nicolay N. Zyk <relo.san@gmail.com>
  */
 class dinCacheDoctrineListener extends Doctrine_Record_Listener
 {
@@ -36,7 +36,7 @@ class dinCacheDoctrineListener extends Doctrine_Record_Listener
 
 
     /**
-     * postDelete
+     * Post delete event
      * 
      * @param   Doctrine_Event  $event
      * @return  void

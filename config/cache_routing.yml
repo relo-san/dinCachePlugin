@@ -8,19 +8,19 @@
 #
 # @package      dinCachePlugin
 # @subpackage   config
-# @author       Nicolay N.Zyk <relo.san.pub@gmail.com>
+# @author       Nicolay N. Zyk <relo.san@gmail.com>
 
 routes:
     page:
         type:           'page'
         get:
             model:      ':model'
-            method:     'getListPagerQuery'
-            path:       ':_root/:_model/:_type/def/:page'
-            key:        ':_type.:page.:_i18n.cache'
+            method:     'getPagerQuery'
+            path:       ':_root/:_model/page/:page'
+            key:        ':page.:_i18n.cache'
         remove:
             default:
-                path:   ':_root/:_model/:_type/def/*/*/*/'
+                path:   ':_root/:_model/page/*/*/*/'
                 key:    '*.cache'
 
     data:
@@ -28,23 +28,23 @@ routes:
         get:
             model:      ':model'
             method:     'getItemQuery'
-            path:       ':_root/:_model/:_type/def/:id'
-            key:        ':_type.:id.:_i18n.cache'
+            path:       ':_root/:_model/data/:id'
+            key:        ':id.:_i18n.cache'
         remove:
             default:
-                path:   ':_root/:_model/:_type/def/:id'
-                key:    ':_type.:id.*.cache'
+                path:   ':_root/:_model/data/:id'
+                key:    ':id.*.cache'
 
     choices:
         type:           'choices'
         get:
             model:      ':model'
             method:     'getChoicesQuery'
-            path:       ':_root/:_model/:_type/def'
-            key:        ':_type.:_i18n.cache'
+            path:       ':_root/:_model/choices'
+            key:        ':_i18n.cache'
         remove:
             default:
-                path:   ':_root/:_model/:_type/def'
-                key:    ':_type.*.cache'
+                path:   ':_root/:_model/choices'
+                key:    '*.cache'
 
 #EOF

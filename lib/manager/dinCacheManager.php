@@ -13,12 +13,14 @@
  * 
  * @package     dinCachePlugin
  * @subpackage  lib.manager
- * @author      Nicolay N.Zyk <relo.san.pub@gmail.com>
+ * @author      Nicolay N. Zyk <relo.san@gmail.com>
  */
 class dinCacheManager
 {
 
     protected
+        $dispatcher = null,
+        $options = array(),
         $routes = array(),
         $links = array(),
         $trans = array(),
@@ -36,13 +38,11 @@ class dinCacheManager
     {
 
         $this->dispatcher = $dispatcher;
-        $this->options = array_merge( array(
-            'defaults'              => array(),
-            'load_configuration'    => false
-        ), $options );
+        $this->options = array_merge(
+            array( 'defaults' => array(), 'load_configuration' => true ), $options
+        );
 
-
-        $this->loadConfiguration();
+        $this->loadConfiguration( true );
 
     } // dinCacheManager::__construct()
 
@@ -50,17 +50,22 @@ class dinCacheManager
     /**
      * Load configuration
      * 
+     * @param   boolean $isLazy Lazy loading configuration
      * @return  void
      */
-    public function loadConfiguration()
+    public function loadConfiguration( $isLazy = false )
     {
+
+        if ( !$isLazy && !$this->options['load_configuration'] )
+        {
+            $this->options['load_configuration'] = true;
+        }
 
         if ( $this->options['load_configuration'] && $config = $this->getRoutesConfig() )
         {
-            include( $config );
+            include $config;
+            $this->dispatcher->notify( new sfEvent( $this, 'cache_manager.load_configuration' ) );
         }
-
-        $this->dispatcher->notify( new sfEvent( $this, 'cache_routing.load_configuration' ) );
 
     } // dinCacheManager::loadConfiguration()
 
@@ -89,6 +94,11 @@ class dinCacheManager
      */
     public function getContent( $route, $model, $params = array() )
     {
+
+        if ( !$this->options['load_configuration'] )
+        {
+            $this->loadConfiguration();
+        }
 
         if ( !isset( $this->links[$model] ) || !in_array( $route, $this->links[$model] ) )
         {
@@ -272,6 +282,11 @@ class dinCacheManager
     public function setContent( $route, $data, $model, $params = array() )
     {
 
+        if ( !$this->options['load_configuration'] )
+        {
+            $this->loadConfiguration();
+        }
+
         $params['_model'] = $model;
         $params['_type'] = $this->routes[$route]['type'];
         if ( !isset( $params['_no_prepare_translations'] ) )
@@ -294,6 +309,11 @@ class dinCacheManager
     public function getQueryMethod( $route )
     {
 
+        if ( !$this->options['load_configuration'] )
+        {
+            $this->loadConfiguration();
+        }
+
         return isset( $this->routes[$route]['get']['method'] )
             ? $this->routes[$route]['get']['method'] : null;
 
@@ -309,6 +329,11 @@ class dinCacheManager
      */
     public function removeCacheForModel( $model, array $params = array() )
     {
+
+        if ( !$this->options['load_configuration'] )
+        {
+            $this->loadConfiguration();
+        }
 
         if ( !isset( $this->links[$model] ) )
         {
@@ -337,6 +362,11 @@ class dinCacheManager
     public function removeCacheForRoute( $route, $params )
     {
 
+        if ( !$this->options['load_configuration'] )
+        {
+            $this->loadConfiguration();
+        }
+
         if ( isset( $this->routes[$route]['remove'] ) )
         {
 
@@ -362,10 +392,48 @@ class dinCacheManager
 
         $params['_root'] = sfConfig::get( 'sf_cache_dir' ) . '/data';
         $class = $this->getRouteOption( $route, 'driver', 'sfFileCache' );
-        return new $class( array(
-            'lifetime' => $this->getRouteOption( $route, 'ttl', 157680000 ),
-            'cache_dir' => $this->getCachePath( $route, $action, $params )
-        ) );
+        $options = array();
+        switch ( $class )
+        {
+            case 'sfFileCache':
+                $options = array(
+                    'lifetime' => $this->getRouteOption( $route, 'ttl', 157680000 ),
+                    'cache_dir' => $this->getCachePath( $route, $action, $params )
+                );
+                break;
+            case 'sfAPCCache':
+            case 'sfEAcceleratorCache':
+            case 'sfXCacheCache':
+            case 'sfNoCache':
+                $options = array(
+                    'lifetime' => $this->getRouteOption( $route, 'ttl', 157680000 )
+                );
+                break;
+            case 'sfSQLiteCache':
+                $options = array(
+                    'lifetime' => $this->getRouteOption( $route, 'ttl', 157680000 ),
+                    'database' => $this->getRouteOption( $route, 'db' )
+                );
+                break;
+            case 'sfMemcacheCache':
+                $options = array(
+                    'lifetime' => $this->getRouteOption( $route, 'ttl', 157680000 ),
+                    'servers' => $this->getRouteOption( $route, 'servers' ),
+                    'persistent' => $this->getRouteOption( $route, 'persistent', true ),
+                    'host' => $this->getRouteOption( $route, 'host', 'localhost' ),
+                    'port' => $this->getRouteOption( $route, 'port', 11211 ),
+                    'timeout' => $this->getRouteOption( $route, 'timeout', 1 )
+                );
+                break;
+            default:
+                $class = 'sfFileCache';
+                $options = array(
+                    'lifetime' => $this->getRouteOption( $route, 'ttl', 157680000 ),
+                    'cache_dir' => $this->getCachePath( $route, $action, $params )
+                );
+                break;
+        }
+        return new $class( $options );
 
     } // dinCacheManager::getCacheDriver()
 
@@ -411,7 +479,7 @@ class dinCacheManager
      * @param   array   $params Route params
      * @return  string  Cache path
      */
-    public function getCachePath( $route, $action, $params )
+    protected function getCachePath( $route, $action, $params )
     {
 
         if ( $action == 'get' )
@@ -556,7 +624,7 @@ class dinCacheManager
     /**
      * Prepare translations in result array
      * 
-     * @param   array   Source array [optional]
+     * @param   array   $array  Source array [optional]
      * @return  array   Result array with moved translations
      */
     public function prepareTranslations( array $array = array() )
