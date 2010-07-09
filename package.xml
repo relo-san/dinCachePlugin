@@ -3,7 +3,7 @@
     <name>dinCachePlugin</name>
     <channel>plugins.symfony-project.org</channel>
     <summary>Smart cache plugin.</summary>
-    <description>Identity management plugin.</description>
+    <description>Smart cache plugin.</description>
     <lead>
         <name>Nicolay N. Zyk</name>
         <user>relo_san</user>
