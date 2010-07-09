@@ -17,11 +17,11 @@ routes:
             model:      ':model'
             method:     'getPagerQuery'
             path:       ':_root/:_model/page/:page'
-            key:        ':page.:_i18n.cache'
+            key:        ':page.:_i18n'
         remove:
             default:
                 path:   ':_root/:_model/page/*/*/*/'
-                key:    '*.cache'
+                key:    '*'
 
     data:
         type:           'data'
@@ -29,11 +29,11 @@ routes:
             model:      ':model'
             method:     'getItemQuery'
             path:       ':_root/:_model/data/:id'
-            key:        ':id.:_i18n.cache'
+            key:        ':id.:_i18n'
         remove:
             default:
                 path:   ':_root/:_model/data/:id'
-                key:    ':id.*.cache'
+                key:    ':id.*'
 
     choices:
         type:           'choices'
@@ -41,10 +41,10 @@ routes:
             model:      ':model'
             method:     'getChoicesQuery'
             path:       ':_root/:_model/choices'
-            key:        ':_i18n.cache'
+            key:        ':_i18n'
         remove:
             default:
                 path:   ':_root/:_model/choices'
-                key:    '*.cache'
+                key:    '*'
 
 #EOF
